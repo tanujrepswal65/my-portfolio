@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TaskFlow - Task Management App</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./task-managment.css">
+  
+</head>
+<body class="noise-bg">
+  <!-- Background effects -->
+  <div class="glow-orb glow-1"></div>
+  <div class="glow-orb glow-2"></div>
+
+  <div class="flex min-h-screen relative z-10">
+    <!-- Sidebar -->
+     <!-- Add this inside the sidebar, right after the logo -->
+<a href="index.html" class="flex items-center gap-2 mb-6 text-sm hover:text-[var(--accent)] transition-colors" style="color: var(--muted);">
+  <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+    <path d="M19 12H5M12 19l-7-7 7-7"/>
+  </svg>
+  Back to Portfolio
+</a>
+    <aside class="hidden lg:flex flex-col w-64 p-6 border-r" style="border-color: var(--border); background: var(--bg-elevated);">
+      <div class="flex items-center gap-3 mb-8">
+        <div class="w-10 h-10 rounded-xl flex items-center justify-center" style="background: var(--accent-dim);">
+          <svg class="w-5 h-5" style="color: var(--accent);" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M9 11l3 3L22 4"/>
+            <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/>
+          </svg>
+        </div>
+        <span class="text-xl font-bold">TaskFlow</span>
+      </div>
+
+      <nav class="space-y-1 flex-1">
+        <div class="sidebar-link active" data-filter="all">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="3" width="7" height="7" rx="1"/>
+            <rect x="14" y="3" width="7" height="7" rx="1"/>
+            <rect x="3" y="14" width="7" height="7" rx="1"/>
+            <rect x="14" y="14" width="7" height="7" rx="1"/>
+          </svg>
+          All Tasks
+          <span class="ml-auto text-xs px-2 py-0.5 rounded-full" style="background: var(--border);" id="allCount">0</span>
+        </div>
+        <div class="sidebar-link" data-filter="today">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/>
+            <path d="M12 6v6l4 2"/>
+          </svg>
+          Today
+        </div>
+        <div class="sidebar-link" data-filter="important">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+          </svg>
+          Important
+        </div>
+        <div class="sidebar-link" data-filter="completed">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M22 11.08V12a10 10 0 11-5.93-9.14"/>
+            <polyline points="22 4 12 14.01 9 11.01"/>
+          </svg>
+          Completed
+        </div>
+
+        <div class="pt-6 mt-6 border-t" style="border-color: var(--border);">
+          <p class="text-xs font-medium mb-3 px-3" style="color: var(--muted);">CATEGORIES</p>
+          <div id="categoryList" class="space-y-1">
+            <!-- Categories rendered here -->
+          </div>
+        </div>
+      </nav>
+
+      <!-- Progress summary -->
+      <div class="mt-6 p-4 rounded-xl" style="background: var(--bg); border: 1px solid var(--border);">
+        <div class="flex items-center justify-between mb-3">
+          <span class="text-sm font-medium">Progress</span>
+          <span class="text-sm font-mono" style="color: var(--accent);" id="progressPercent">0%</span>
+        </div>
+        <div class="h-2 rounded-full overflow-hidden" style="background: var(--border);">
+          <div id="progressBar" class="h-full rounded-full transition-all duration-500" style="background: var(--accent); width: 0%;"></div>
+        </div>
+        <p class="text-xs mt-2" style="color: var(--muted);"><span id="completedCount">0</span> of <span id="totalCount">0</span> tasks completed</p>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 p-6 lg:p-8">
+      <!-- Header -->
+      <header class="mb-8 animate-fade-up">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+          <div>
+            <p class="text-sm font-mono mb-1" style="color: var(--accent);">// Dashboard</p>
+            <h1 class="text-3xl lg:text-4xl font-bold">My Tasks</h1>
+          </div>
+          <button id="addTaskBtn" class="btn-primary">
+            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <line x1="12" y1="5" x2="12" y2="19"/>
+              <line x1="5" y1="12" x2="19" y2="12"/>
+            </svg>
+            Add Task
+          </button>
+        </div>
+
+        <!-- Search and filters -->
+        <div class="flex flex-col sm:flex-row gap-4">
+          <div class="relative flex-1">
+            <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5" style="color: var(--muted);" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="8"/>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+            </svg>
+            <input type="text" id="searchInput" class="form-input pl-10" placeholder="Search tasks...">
+          </div>
+          <div class="flex gap-2 p-1 rounded-lg" style="background: var(--bg-elevated);">
+            <button class="filter-tab active" data-priority="all">All</button>
+            <button class="filter-tab" data-priority="high">High</button>
+            <button class="filter-tab" data-priority="medium">Medium</button>
+            <button class="filter-tab" data-priority="low">Low</button>
+          </div>
+        </div>
+      </header>
+
+      <!-- Board View -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="boardView">
+        <!-- Todo Column -->
+        <div class="task-column p-4" data-status="todo">
+          <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center gap-2">
+              <div class="w-3 h-3 rounded-full" style="background: var(--info);"></div>
+              <h2 class="font-semibold">To Do</h2>
+              <span class="text-xs px-2 py-0.5 rounded-full" style="background: var(--border);" id="todoCount">0</span>
+            </div>
+          </div>
+          <div class="space-y-3 min-h-[300px]" id="todoList">
+            <!-- Tasks rendered here -->
+          </div>
+        </div>
+
+        <!-- In Progress Column -->
+        <div class="task-column p-4" data-status="inprogress">
+          <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center gap-2">
+              <div class="w-3 h-3 rounded-full" style="background: var(--warning);"></div>
+              <h2 class="font-semibold">In Progress</h2>
+              <span class="text-xs px-2 py-0.5 rounded-full" style="background: var(--border);" id="inprogressCount">0</span>
+            </div>
+          </div>
+          <div class="space-y-3 min-h-[300px]" id="inprogressList">
+            <!-- Tasks rendered here -->
+          </div>
+        </div>
+
+        <!-- Done Column -->
+        <div class="task-column p-4" data-status="done">
+          <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center gap-2">
+              <div class="w-3 h-3 rounded-full" style="background: var(--accent);"></div>
+              <h2 class="font-semibold">Done</h2>
+              <span class="text-xs px-2 py-0.5 rounded-full" style="background: var(--border);" id="doneCount">0</span>
+            </div>
+          </div>
+          <div class="space-y-3 min-h-[300px]" id="doneList">
+            <!-- Tasks rendered here -->
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Task Modal -->
+  <div id="taskModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal-content">
+      <div class="flex items-center justify-between mb-6">
+        <h2 id="modalTitle" class="text-xl font-bold">New Task</h2>
+        <button id="closeModal" class="btn-ghost" aria-label="Close modal">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"/>
+            <line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+
+      <form id="taskForm" class="space-y-4">
+        <div>
+          <label for="taskTitle" class="block text-sm font-medium mb-2">Title</label>
+          <input type="text" id="taskTitle" class="form-input" placeholder="Enter task title" required>
+        </div>
+        <div>
+          <label for="taskDescription" class="block text-sm font-medium mb-2">Description</label>
+          <textarea id="taskDescription" class="form-input" rows="3" placeholder="Add details..."></textarea>
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label for="taskPriority" class="block text-sm font-medium mb-2">Priority</label>
+            <select id="taskPriority" class="form-input">
+              <option value="low">Low</option>
+              <option value="medium" selected>Medium</option>
+              <option value="high">High</option>
+            </select>
+          </div>
+          <div>
+            <label for="taskCategory" class="block text-sm font-medium mb-2">Category</label>
+            <select id="taskCategory" class="form-input">
+              <!-- Categories rendered here -->
+            </select>
+          </div>
+        </div>
+        <div>
+          <label for="taskDueDate" class="block text-sm font-medium mb-2">Due Date</label>
+          <input type="date" id="taskDueDate" class="form-input">
+        </div>
+        <input type="hidden" id="taskId">
+        <div class="flex gap-3 pt-2">
+          <button type="submit" class="btn-primary flex-1 justify-center">
+            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="20 6 9 17 4 12"/>
+            </svg>
+            <span id="submitBtnText">Create Task</span>
+          </button>
+          <button type="button" id="cancelBtn" class="btn-ghost px-6">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+<script src="./task-managment.js"></script>
+  </body>
+</html>

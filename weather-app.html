@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Weather Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./weather-app.css">
+  
+</head>
+<body>
+  <!-- Dynamic Background -->
+  <div class="weather-bg" id="weatherBg"></div>
+
+  <div class="min-h-screen p-4 md:p-8">
+    <div class="max-w-6xl mx-auto">
+      
+      <!-- Header -->
+      <header class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8 reveal">
+        <div>
+          <a href="index.html" class="inline-flex items-center gap-2 text-sm mb-2 hover:text-[var(--accent)] transition-colors" style="color: var(--muted);">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M19 12H5M12 19l-7-7 7-7"/>
+            </svg>
+            Back to Portfolio
+          </a>
+          <h1 class="text-2xl font-bold">Weather Dashboard</h1>
+        </div>
+
+        <!-- Search -->
+        <div class="relative w-full md:w-80">
+          <svg class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5" style="color: var(--muted);" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"/>
+            <path d="M21 21l-4.35-4.35"/>
+          </svg>
+          <input type="text" id="searchInput" class="search-input" placeholder="Search city...">
+        </div>
+      </header>
+
+      <!-- Main Grid -->
+      <div class="grid lg:grid-cols-3 gap-6">
+        
+        <!-- Main Weather Card -->
+        <div class="lg:col-span-2 glass-card p-8 reveal delay-1">
+          <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+            
+            <!-- Left: Temp Info -->
+            <div>
+              <div class="flex items-center gap-2 mb-2">
+                <svg class="w-5 h-5" style="color: var(--accent);" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                  <circle cx="12" cy="10" r="3"/>
+                </svg>
+                <span id="cityName" class="text-lg font-medium">San Francisco</span>
+              </div>
+              <p id="currentDate" class="text-sm mb-4" style="color: var(--muted);">Saturday, Oct 28</p>
+              
+              <div class="flex items-end gap-4">
+                <span id="currentTemp" class="text-7xl md:text-8xl font-bold">18°</span>
+                <div class="mb-4">
+                  <p id="weatherDesc" class="text-xl font-medium">Partly Cloudy</p>
+                  <p id="feelsLike" class="text-sm" style="color: var(--muted);">Feels like 16°</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Right: Animated Icon -->
+            <div id="weatherIconContainer" class="w-40 h-40 relative">
+              <!-- Default: Sunny animation -->
+              <div class="absolute inset-0 flex items-center justify-center">
+                <div class="sun-glow absolute w-32 h-32 rounded-full bg-gradient-to-br from-yellow-400 to-orange-500 opacity-30 blur-xl"></div>
+                <svg class="sun-icon w-24 h-24" viewBox="0 0 100 100">
+                  <circle cx="50" cy="50" r="20" fill="#fbbf24"/>
+                  <g stroke="#fbbf24" stroke-width="3" stroke-linecap="round">
+                    <line x1="50" y1="10" x2="50" y2="20"/>
+                    <line x1="50" y1="80" x2="50" y2="90"/>
+                    <line x1="10" y1="50" x2="20" y2="50"/>
+                    <line x1="80" y1="50" x2="90" y2="50"/>
+                    <line x1="22" y1="22" x2="29" y2="29"/>
+                    <line x1="71" y1="71" x2="78" y2="78"/>
+                    <line x1="22" y1="78" x2="29" y2="71"/>
+                    <line x1="71" y1="29" x2="78" y2="22"/>
+                  </g>
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick Stats Row -->
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8 pt-6 border-t" style="border-color: var(--border);">
+            <div>
+              <p class="text-xs uppercase tracking-wider mb-1" style="color: var(--muted);">Wind</p>
+              <p id="windSpeed" class="text-lg font-semibold">12 km/h</p>
+            </div>
+            <div>
+              <p class="text-xs uppercase tracking-wider mb-1" style="color: var(--muted);">Humidity</p>
+              <p id="humidity" class="text-lg font-semibold">65%</p>
+            </div>
+            <div>
+              <p class="text-xs uppercase tracking-wider mb-1" style="color: var(--muted);">Visibility</p>
+              <p id="visibility" class="text-lg font-semibold">10 km</p>
+            </div>
+            <div>
+              <p class="text-xs uppercase tracking-wider mb-1" style="color: var(--muted);">Pressure</p>
+              <p id="pressure" class="text-lg font-semibold">1013 hPa</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Side: Stats -->
+        <div class="space-y-6">
+          
+          <!-- UV Index -->
+          <div class="glass-card p-6 reveal delay-2">
+            <p class="text-xs uppercase tracking-wider mb-4" style="color: var(--muted);">UV Index</p>
+            <div class="flex items-center justify-between">
+              <div class="stat-ring">
+                <svg width="60" height="60">
+                  <circle class="bg-circle" cx="30" cy="30" r="26"/>
+                  <circle class="progress-circle" cx="30" cy="30" r="26" 
+                          stroke-dasharray="163.36" 
+                          stroke-dashoffset="98"
+                          style="stroke: #fbbf24;"/>
+                </svg>
+                <div class="absolute inset-0 flex items-center justify-center">
+                  <span id="uvIndex" class="text-lg font-bold">4</span>
+                </div>
+              </div>
+              <div class="text-right">
+                <p class="font-medium">Moderate</p>
+                <p class="text-xs" style="color: var(--muted);">Use sun protection</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Sunrise/Sunset -->
+          <div class="glass-card p-6 reveal delay-3">
+            <p class="text-xs uppercase tracking-wider mb-4" style="color: var(--muted);">Sunrise & Sunset</p>
+            <div class="flex justify-between items-center">
+              <div class="text-center">
+                <svg class="w-8 h-8 mx-auto mb-2" style="color: var(--accent);" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M17 18a5 5 0 0 0-10 0"/>
+                  <line x1="12" y1="9" x2="12" y2="2"/>
+                  <line x1="4.22" y1="10.22" x2="5.64" y2="11.64"/>
+                  <line x1="1" y1="18" x2="3" y2="18"/>
+                  <line x1="21" y1="18" x2="23" y2="18"/>
+                  <line x1="18.36" y1="11.64" x2="19.78" y2="10.22"/>
+                </svg>
+                <p id="sunrise" class="font-mono font-medium">06:42</p>
+                <p class="text-xs" style="color: var(--muted);">Sunrise</p>
+              </div>
+              <div class="h-12 w-px" style="background: var(--border);"></div>
+              <div class="text-center">
+                <svg class="w-8 h-8 mx-auto mb-2" style="color: var(--accent-secondary);" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M17 18a5 5 0 0 0-10 0"/>
+                  <line x1="12" y1="2" x2="12" y2="9"/>
+                  <line x1="4.22" y1="10.22" x2="5.64" y2="11.64"/>
+                  <line x1="1" y1="18" x2="3" y2="18"/>
+                  <line x1="21" y1="18" x2="23" y2="18"/>
+                  <line x1="18.36" y1="11.64" x2="19.78" y2="10.22"/>
+                </svg>
+                <p id="sunset" class="font-mono font-medium">19:28</p>
+                <p class="text-xs" style="color: var(--muted);">Sunset</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Air Quality -->
+          <div class="glass-card p-6 reveal delay-4">
+            <p class="text-xs uppercase tracking-wider mb-4" style="color: var(--muted);">Air Quality</p>
+            <div class="flex items-center gap-4">
+              <div class="w-12 h-12 rounded-xl flex items-center justify-center text-lg font-bold" style="background: rgba(0, 255, 136, 0.1); color: var(--accent);">
+                42
+              </div>
+              <div>
+                <p class="font-medium">Good</p>
+                <p class="text-xs" style="color: var(--muted);">Air quality is satisfactory</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 5-Day Forecast -->
+      <div class="mt-8 glass-card p-6 reveal" style="animation-delay: 0.5s;">
+        <div class="flex justify-between items-center mb-6">
+          <h2 class="font-semibold">5-Day Forecast</h2>
+          <p class="text-xs" style="color: var(--muted);">Scroll for more</p>
+        </div>
+        
+        <div class="forecast-scroll" id="forecastContainer">
+          <!-- Forecast cards rendered here -->
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+ <script src="./weather-app.js"></script>
+</body>
+</html>

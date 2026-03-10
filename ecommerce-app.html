@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>STRT/WEAR - Premium Store</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #08080c;
+      --bg-elevated: #0e0e14;
+      --fg: #e4e4eb;
+      --muted: #6b6b7a;
+      --accent: #00ff88;
+      --accent-dim: rgba(0, 255, 136, 0.15);
+      --danger: #ff4757;
+      --card: #14141c;
+      --border: #1e1e2a;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Space Grotesk', sans-serif;
+      background: var(--bg);
+      color: var(--fg);
+      overflow-x: hidden;
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--muted); }
+
+    /* Animations */
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes slideIn {
+      from { transform: translateX(100%); }
+      to { transform: translateX(0); }
+    }
+    @keyframes slideOut {
+      from { transform: translateX(0); }
+      to { transform: translateX(100%); }
+    }
+
+    .animate-fade-in { animation: fadeIn 0.3s ease; }
+    .animate-slide-up { animation: slideUp 0.5s ease forwards; opacity: 0; }
+
+    /* Product Card */
+    .product-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+
+    .product-card:hover {
+      border-color: rgba(255, 255, 255, 0.1);
+      transform: translateY(-4px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+    }
+
+    .product-card:hover .product-img {
+      transform: scale(1.05);
+    }
+
+    .product-card:hover .quick-add {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .product-img {
+      transition: transform 0.5s ease;
+    }
+
+    .quick-add {
+      position: absolute;
+      bottom: 16px;
+      left: 16px;
+      right: 16px;
+      background: var(--accent);
+      color: var(--bg);
+      padding: 12px;
+      border-radius: 8px;
+      font-weight: 600;
+      text-align: center;
+      cursor: pointer;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: all 0.3s ease;
+      border: none;
+      width: calc(100% - 32px);
+    }
+
+    .quick-add:hover {
+      background: #00cc6a;
+    }
+
+    /* Cart Sidebar */
+    .cart-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(4px);
+      z-index: 99;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+    }
+
+    .cart-overlay.open {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .cart-sidebar {
+      position: fixed;
+      top: 0;
+      right: 0;
+      width: 100%;
+      max-width: 420px;
+      height: 100%;
+      background: var(--bg-elevated);
+      border-left: 1px solid var(--border);
+      z-index: 100;
+      transform: translateX(100%);
+      transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .cart-sidebar.open {
+      transform: translateX(0);
+    }
+
+    /* Buttons */
+    .btn-primary {
+      background: var(--accent);
+      color: var(--bg);
+      padding: 14px 28px;
+      border-radius: 8px;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(0, 255, 136, 0.25);
+    }
+
+    .btn-outline {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--fg);
+      padding: 14px 28px;
+      border-radius: 8px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .btn-outline:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    /* Filter Pills */
+    .filter-pill {
+      padding: 8px 20px;
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: 500;
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .filter-pill:hover {
+      border-color: var(--fg);
+      color: var(--fg);
+    }
+
+    .filter-pill.active {
+      background: var(--fg);
+      border-color: var(--fg);
+      color: var(--bg);
+    }
+
+    /* Badge */
+    .cart-badge {
+      position: absolute;
+      top: -6px;
+      right: -6px;
+      width: 20px;
+      height: 20px;
+      background: var(--accent);
+      color: var(--bg);
+      border-radius: 50%;
+      font-size: 11px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Quantity Control */
+    .qty-control {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: var(--bg);
+      padding: 4px 8px;
+      border-radius: 6px;
+    }
+
+    .qty-btn {
+      width: 28px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: transparent;
+      border: none;
+      color: var(--fg);
+      cursor: pointer;
+      transition: color 0.2s;
+    }
+
+    .qty-btn:hover { color: var(--accent); }
+  </style>
+</head>
+<body>
+
+  <!-- Navigation -->
+  <nav class="fixed top-0 left-0 right-0 z-50 backdrop-blur-lg bg-[rgba(8,8,12,0.8)] border-b border-[var(--border)]">
+    <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+      <a href="index.html" class="flex items-center gap-2 text-sm hover:text-[var(--accent)] transition-colors" style="color: var(--muted);">
+        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M19 12H5M12 19l-7-7 7-7"/>
+        </svg>
+        Back
+      </a>
+      
+      <a href="#" class="text-xl font-bold tracking-tight">STRT/<span style="color: var(--accent);">WEAR</span></a>
+      
+      <button id="cartBtn" class="relative p-2 hover:bg-[var(--accent-dim)] rounded-lg transition-colors" aria-label="Open cart">
+        <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
+          <line x1="3" y1="6" x2="21" y2="6"/>
+          <path d="M16 10a4 4 0 0 1-8 0"/>
+        </svg>
+        <span id="cartCount" class="cart-badge" style="display: none;">0</span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section class="pt-32 pb-16 px-6">
+    <div class="max-w-7xl mx-auto text-center">
+      <p class="font-mono text-sm tracking-widest mb-4 animate-slide-up" style="color: var(--accent); animation-delay: 0.1s;">NEW COLLECTION 2024</p>
+      <h1 class="text-4xl md:text-6xl font-bold mb-6 animate-slide-up" style="animation-delay: 0.2s;">
+        Premium Street Essentials
+      </h1>
+      <p class="text-lg max-w-xl mx-auto animate-slide-up" style="color: var(--muted); animation-delay: 0.3s;">
+        Minimalist design meets premium quality. Discover our curated selection of modern apparel.
+      </p>
+    </div>
+  </section>
+
+  <!-- Filters -->
+  <section class="px-6 mb-12">
+    <div class="max-w-7xl mx-auto flex flex-wrap justify-center gap-3">
+      <button class="filter-pill active" data-filter="all">All</button>
+      <button class="filter-pill" data-filter="hoodies">Hoodies</button>
+      <button class="filter-pill" data-filter="tshirts">T-Shirts</button>
+      <button class="filter-pill" data-filter="accessories">Accessories</button>
+      <button class="filter-pill" data-filter="footwear">Footwear</button>
+    </div>
+  </section>
+
+  <!-- Product Grid -->
+  <main class="px-6 pb-24">
+    <div class="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6" id="productGrid">
+      <!-- Products rendered here -->
+    </div>
+  </main>
+
+  <!-- Cart Overlay -->
+  <div id="cartOverlay" class="cart-overlay"></div>
+
+  <!-- Cart Sidebar -->
+  <aside id="cartSidebar" class="cart-sidebar">
+    <div class="p-6 border-b border-[var(--border)] flex items-center justify-between">
+      <h2 class="text-xl font-bold">Your Cart</h2>
+      <button id="closeCart" class="p-2 hover:bg-[var(--border)] rounded-lg transition-colors" aria-label="Close cart">
+        <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18"/>
+          <line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+    
+    <div class="flex-1 overflow-y-auto p-6" id="cartItems">
+      <!-- Cart items rendered here -->
+    </div>
+
+    <div class="p-6 border-t border-[var(--border)] bg-[var(--bg)]">
+      <div class="flex justify-between mb-2">
+        <span style="color: var(--muted);">Subtotal</span>
+        <span id="subtotal" class="font-bold">$0.00</span>
+      </div>
+      <div class="flex justify-between mb-6">
+        <span style="color: var(--muted);">Shipping</span>
+        <span class="text-sm" style="color: var(--accent);">FREE</span>
+      </div>
+      <button class="btn-primary w-full justify-center" id="checkoutBtn">
+        Checkout
+      </button>
+    </div>
+  </aside>
+
+  <script>
+    // Product Data
+    const products = [
+      { id: 1, name: "Essential Hoodie", price: 89.00, category: "hoodies", image: "https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=600&h=750&fit=crop" },
+      { id: 2, name: "Graphic Tee", price: 45.00, category: "tshirts", image: "https://images.unsplash.com/photo-1576566588028-4147f3842f27?w=600&h=750&fit=crop" },
+      { id: 3, name: "Tech Backpack", price: 120.00, category: "accessories", image: "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=600&h=750&fit=crop" },
+      { id: 4, name: "Runner Sneakers", price: 150.00, category: "footwear", image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=600&h=750&fit=crop" },
+      { id: 5, name: "Oversized Hoodie", price: 95.00, category: "hoodies", image: "https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?w=600&h=750&fit=crop" },
+      { id: 6, name: "Minimal Watch", price: 220.00, category: "accessories", image: "https://images.unsplash.com/photo-1524592094714-0f0654e20314?w=600&h=750&fit=crop" },
+      { id: 7, name: "Cotton Crew Tee", price: 35.00, category: "tshirts", image: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=600&h=750&fit=crop" },
+      { id: 8, name: "Urban Boots", price: 180.00, category: "footwear", image: "https://images.unsplash.com/photo-1608256246200-53e635b5b65f?w=600&h=750&fit=crop" }
+    ];
+
+    // State
+    let cart = JSON.parse(localStorage.getItem('strt_cart')) || [];
+    let currentFilter = 'all';
+
+    // DOM Elements
+    const productGrid = document.getElementById('productGrid');
+    const cartSidebar = document.getElementById('cartSidebar');
+    const cartOverlay = document.getElementById('cartOverlay');
+    const cartItems = document.getElementById('cartItems');
+    const cartCount = document.getElementById('cartCount');
+    const subtotal = document.getElementById('subtotal');
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', () => {
+      renderProducts();
+      setupEventListeners();
+      updateCartUI();
+    });
+
+    // Render Products
+    function renderProducts() {
+      const filtered = currentFilter === 'all' 
+        ? products 
+        : products.filter(p => p.category === currentFilter);
+
+      productGrid.innerHTML = filtered.map((p, i) => `
+        <div class="product-card animate-slide-up" style="animation-delay: ${i * 0.05}s;">
+          <div class="relative overflow-hidden aspect-[3/4]">
+            <img src="${p.image}" alt="${p.name}" class="product-img w-full h-full object-cover">
+            <button class="quick-add" onclick="addToCart(${p.id})">Add to Cart</button>
+          </div>
+          <div class="p-4">
+            <h3 class="font-medium mb-1">${p.name}</h3>
+            <p style="color: var(--accent);">$${p.price.toFixed(2)}</p>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // Cart Logic
+    function addToCart(id) {
+      const product = products.find(p => p.id === id);
+      const existing = cart.find(item => item.id === id);
+      
+      if (existing) {
+        existing.quantity++;
+      } else {
+        cart.push({ ...product, quantity: 1 });
+      }
+      
+      saveCart();
+      updateCartUI();
+      
+      // Flash the cart button
+      document.getElementById('cartBtn').classList.add('scale-110');
+      setTimeout(() => {
+        document.getElementById('cartBtn').classList.remove('scale-110');
+      }, 150);
+    }
+
+    function removeFromCart(id) {
+      cart = cart.filter(item => item.id !== id);
+      saveCart();
+      updateCartUI();
+    }
+
+    function updateQuantity(id, change) {
+      const item = cart.find(item => item.id === id);
+      if (item) {
+        item.quantity += change;
+        if (item.quantity <= 0) {
+          removeFromCart(id);
+        } else {
+          saveCart();
+          updateCartUI();
+        }
+      }
+    }
+
+    function updateCartUI() {
+      // Update count badge
+      const count = cart.reduce((sum, item) => sum + item.quantity, 0);
+      cartCount.textContent = count;
+      cartCount.style.display = count > 0 ? 'flex' : 'none';
+      
+      // Update subtotal
+      const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+      subtotal.textContent = `$${total.toFixed(2)}`;
+      
+      // Render cart items
+      if (cart.length === 0) {
+        cartItems.innerHTML = `
+          <div class="text-center py-20">
+            <svg class="w-16 h-16 mx-auto mb-4 opacity-20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+              <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
+              <line x1="3" y1="6" x2="21" y2="6"/>
+              <path d="M16 10a4 4 0 0 1-8 0"/>
+            </svg>
+            <p style="color: var(--muted);">Your cart is empty</p>
+          </div>
+        `;
+      } else {
+        cartItems.innerHTML = cart.map(item => `
+          <div class="flex gap-4 mb-6 pb-6 border-b border-[var(--border)]">
+            <img src="${item.image}" alt="${item.name}" class="w-24 h-32 object-cover rounded-lg">
+            <div class="flex-1">
+              <h4 class="font-medium mb-1">${item.name}</h4>
+              <p class="text-sm mb-3" style="color: var(--accent);">$${item.price.toFixed(2)}</p>
+              <div class="flex items-center justify-between">
+                <div class="qty-control">
+                  <button class="qty-btn" onclick="updateQuantity(${item.id}, -1)">-</button>
+                  <span class="text-sm font-medium">${item.quantity}</span>
+                  <button class="qty-btn" onclick="updateQuantity(${item.id}, 1)">+</button>
+                </div>
+                <button onclick="removeFromCart(${item.id})" class="text-sm hover:text-red-400 transition-colors" style="color: var(--muted);">
+                  Remove
+                </button>
+              </div>
+            </div>
+          </div>
+        `).join('');
+      }
+    }
+
+    function saveCart() {
+      localStorage.setItem('strt_cart', JSON.stringify(cart));
+    }
+
+    // Event Listeners
+    function setupEventListeners() {
+      // Cart toggle
+      document.getElementById('cartBtn').addEventListener('click', () => {
+        cartSidebar.classList.add('open');
+        cartOverlay.classList.add('open');
+        document.body.style.overflow = 'hidden';
+      });
+
+      const closeCart = () => {
+        cartSidebar.classList.remove('open');
+        cartOverlay.classList.remove('open');
+        document.body.style.overflow = '';
+      };
+
+      document.getElementById('closeCart').addEventListener('click', closeCart);
+      cartOverlay.addEventListener('click', closeCart);
+
+      // Filters
+      document.querySelectorAll('.filter-pill').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.filter-pill').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          currentFilter = btn.dataset.filter;
+          renderProducts();
+        });
+      });
+
+      // Checkout
+      document.getElementById('checkoutBtn').addEventListener('click', () => {
+        if (cart.length > 0) {
+          alert('Checkout successful! Thank you for your order.');
+          cart = [];
+          saveCart();
+          updateCartUI();
+          closeCart();
+        }
+      });
+    }
+  </script>
+</body>
+</html>
